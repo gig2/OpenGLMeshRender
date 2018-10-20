@@ -12,7 +12,7 @@ void MeshNode<MeshT>::updateVertexBuffer( int const positionLocation, int const 
 {
     // TODO this should be dependant on if the mesh have some function or not
 
-    auto numIndexes_ = mesh_.getNumIndex();
+    numIndexes_      = mesh_.getNumIndex();
     auto numVertices = mesh_.getNumVertices();
     auto numColors   = mesh_.getNumColors();
 

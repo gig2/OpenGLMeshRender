@@ -28,8 +28,9 @@ private:
 
     std::size_t numIndexes_{0};
 
+    const unsigned int numberPointCoordinates_{3};
     const unsigned int verticesNumberPerFace_{3};
-    const unsigned int numberColors_{3};
+    const unsigned int numberColorsPerVertex_{3};
 
     void cleanBuffers_();
 

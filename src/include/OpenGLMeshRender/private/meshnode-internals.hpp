@@ -14,7 +14,7 @@ void MeshNode<MeshT>::updateVertexBuffer( int const positionLocation, int const 
 
     auto numIndexes_ = mesh_.getNumIndex();
     auto numVertices = mesh_.getNumVertices();
-    auto numColors   = mesh_.getNumColors;
+    auto numColors   = mesh_.getNumColors();
 
     auto* indexesPointer  = mesh_.getIndexesPointer();
     auto* verticesPointer = mesh_.getVerticesPointer();

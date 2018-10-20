@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>
 
+#include <cstddef>
 
 template <typename MeshT>
 class MeshNode

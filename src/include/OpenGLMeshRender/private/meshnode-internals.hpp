@@ -35,7 +35,7 @@ void MeshNode<MeshT>::updateVertexBuffer( int const positionLocation, int const 
     glBindBuffer( GL_ARRAY_BUFFER, colorBuffer_ );
     glBufferData( GL_ARRAY_BUFFER, sizeof( GLfloat ) * numColors, colorsPointer, GL_STATIC_DRAW );
 
-    glVertexAttribPointer( colorLocation, 3, GL_FLOAT, GL_FALSE, sizeof( GLfloat ) * 3, 0 );
+    glVertexAttribPointer( colorLocation, 2, GL_FLOAT, GL_FALSE, sizeof( GLfloat ) * 2, 0 );
     glEnableVertexAttribArray( colorLocation );
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, indexBuffer_ );

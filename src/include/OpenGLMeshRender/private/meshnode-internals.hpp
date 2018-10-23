@@ -1,3 +1,4 @@
+#include "../bindoperation.h"
 #include "../meshnode.h"
 
 #include <cassert>
@@ -11,6 +12,12 @@ template <typename MeshT>
 MeshNode<MeshT>::MeshNode( MeshT& meshView )
     : mesh_{meshView}
 {
+    // TODO:
+    // Those operation should be done if the required traits is validated
+    // and it then add those for uv
+    // note that with c++17 we could do simple if constexpr with the required traits by the way
+    // so we may want to check the minimum compiler version "allowed"
+
     // We only manage GLfloat and GLdoule type
     auto const& glFloatId  = typeid( GLfloat );
     auto const& glDoubleId = typeid( GLdouble );
@@ -45,7 +52,7 @@ MeshNode<MeshT>::MeshNode( MeshT& meshView )
 
 
     checkTypeId( colorId );
-    assignCorrectEnum( colorId, colorsType );
+    assignCorrectEnum( colorId, colorsType_ );
 
     // for verticesT we want to get the data type of the element of a vertex:
     // ie the data type of the component
@@ -54,41 +61,31 @@ MeshNode<MeshT>::MeshNode( MeshT& meshView )
     auto const& verticesId = typeid( verticesT );
 
     checkTypeId( verticesId );
-    assignCorrectEnum( verticesId, positionType );
+    assignCorrectEnum( verticesId, positionType_ );
 }
 
 template <typename MeshT>
-void MeshNode<MeshT>::updateVertexBuffer( int const positionLocation, int const colorLocation )
+void MeshNode<MeshT>::updateVertexBuffer( int const positionLocation, int const colorLocation,
+                                          int const uvLocation )
 {
-    // TODO this should be dependant on if the mesh have some function or not
-
-    numIndexes_      = mesh_.getNumIndex();
-    auto numVertices = mesh_.getNumVertices();
-    auto numColors   = mesh_.getNumColors();
-
-    auto* indexesPointer  = mesh_.getIndexesPointer();
-    auto* verticesPointer = mesh_.getVerticesPointer();
-    auto* colorsPointer   = mesh_.getColorsPointer();
-
     regenerateBuffers_();
+
 
     glBindVertexArray( vao_ );
 
-    glBindBuffer( GL_ARRAY_BUFFER, vertexBuffer_ );
-    glBufferData( GL_ARRAY_BUFFER, sizeof( decltype( *verticesPointer ) ) * numVertices,
-                  verticesPointer, GL_STATIC_DRAW );
+    verticesBindBuffer( mesh_, positionLocation, vertexBuffer_, positionType_ );
 
-    glVertexAttribPointer( positionLocation, numberPointCoordinates_, positionType, GL_FALSE,
-                           sizeof( decltype( *verticesPointer ) ), 0 );
-    glEnableVertexAttribArray( positionLocation );
+    colorsBindBuffer( mesh_, colorLocation, colorBuffer_, colorsType_ );
 
-    glBindBuffer( GL_ARRAY_BUFFER, colorBuffer_ );
-    glBufferData( GL_ARRAY_BUFFER, sizeof( *colorsPointer ) * numColors, colorsPointer,
-                  GL_STATIC_DRAW );
+    uvBindBuffer( mesh_, uvLocation, uvBuffer_, uvType_ );
 
-    glVertexAttribPointer( colorLocation, numberColorsPerVertex_, colorsType, GL_FALSE,
-                           sizeof( *colorsPointer ) * numberColorsPerVertex_, 0 );
-    glEnableVertexAttribArray( colorLocation );
+    // For now we say that index is a must have
+    // actually vertex position is needed at least
+
+    // index
+
+    numIndexes_          = mesh_.getNumIndex();
+    auto* indexesPointer = mesh_.getIndexesPointer();
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, indexBuffer_ );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( *indexesPointer ) * numIndexes_, indexesPointer,
@@ -131,6 +128,10 @@ void MeshNode<MeshT>::cleanBuffers_()
     {
         glDeleteBuffers( 1, &colorBuffer_ );
     }
+    if ( glIsBuffer( uvBuffer_ ) )
+    {
+        glDeleteBuffers( 1, &uvBuffer_ );
+    }
 }
 
 template <typename MeshT>
@@ -141,6 +142,7 @@ void MeshNode<MeshT>::regenerateBuffers_()
     glGenBuffers( 1, &vertexBuffer_ );
     glGenBuffers( 1, &indexBuffer_ );
     glGenBuffers( 1, &colorBuffer_ );
+    glGenBuffers( 1, &uvBuffer_ );
 
     glGenVertexArrays( 1, &vao_ );
 }

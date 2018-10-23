@@ -1,6 +1,9 @@
 openglmeshrender_headers = files([
                                   'include/OpenGLMeshRender/meshnode.h',
-                                  'include/OpenGLMeshRender/private/meshnode-internals.hpp',])
+                                  'include/OpenGLMeshRender/private/meshnode-internals.hpp',
+                                  'include/OpenGLMeshRender/bindoperation.h',
+                                  'include/OpenGLMeshRender/mesh_traits.h',
+                                  'include/OpenGLMeshRender/void_t.h'])
 
 openglmeshrender_sources = files(['meshnode.cpp'])
 

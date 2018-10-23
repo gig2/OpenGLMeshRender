@@ -2,7 +2,10 @@ set (openglmeshrender_headers
      include/OpenGLMeshRender/meshnode.h
      include/OpenGLMeshRender/private/meshnode-internals.hpp)
 
-add_library(OpenGLMeshRender ${openglmeshrender_headers})
+set (openglmeshrender_sources
+     meshnode.cpp)
+
+add_library(OpenGLMeshRender ${openglmeshrender_headers} ${openglmeshrender_sources})
 
 target_link_libraries(OpenGLMeshRender PUBLIC
   GLEW::GLEW)

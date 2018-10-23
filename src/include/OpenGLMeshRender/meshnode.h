@@ -3,6 +3,8 @@
 #include <GL/glew.h>
 
 #include <cstddef>
+#include <typeinfo>
+#include <utility>
 
 template <typename MeshT>
 class MeshNode
@@ -21,12 +23,15 @@ public:
 private:
     MeshT &mesh_;
 
+    GLenum positionType{GL_FLOAT};
+    GLenum colorsType{GL_FLOAT};
+
     GLuint vao_{0};
     GLuint indexBuffer_{0};
     GLuint vertexBuffer_{0};
     GLuint colorBuffer_{0};
 
-    std::size_t numIndexes_{0};
+    decltype( std::declval<MeshT>().getNumIndex() ) numIndexes_{0};
 
     const unsigned int numberPointCoordinates_{3};
     const unsigned int verticesNumberPerFace_{3};

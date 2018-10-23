@@ -1,10 +1,60 @@
 #include "../meshnode.h"
 
+#include <cassert>
+#include <type_traits>
+#include <typeinfo>
+#include <utility>
+
+
 
 template <typename MeshT>
 MeshNode<MeshT>::MeshNode( MeshT& meshView )
     : mesh_{meshView}
 {
+    // We only manage GLfloat and GLdoule type
+    auto const& glFloatId  = typeid( GLfloat );
+    auto const& glDoubleId = typeid( GLdouble );
+
+
+    // For this lamdba we do not need to capture glFloatId and glDoubleId since they are a
+    // reference initialized with a constant expression
+
+    // this will assert when the data type is not an OpenGL like
+    auto checkTypeId = []( auto const& type ) {
+        assert( glFloatId.hash_code() == type.hash_code()
+                || glDoubleId.hash_code() == type.hash_code() );
+    };
+
+    // Here we want to set the enumValue to GL_FLOAT or GL_DOUBLE depending on the
+    // data type
+    auto assignCorrectEnum = []( auto const& type, auto& enumValue ) {
+        if ( glFloatId.hash_code() == type.hash_code() )
+        {
+            enumValue = GL_FLOAT;
+        }
+        else if ( glDoubleId.hash_code() == type.hash_code() )
+        {
+            enumValue = GL_DOUBLE;
+        }
+    };
+
+
+    using colorT = decltype( std::declval<MeshT>().getColorsPointer() );
+
+    auto const& colorId = typeid( std::remove_pointer_t<colorT> );
+
+
+    checkTypeId( colorId );
+    assignCorrectEnum( colorId, colorsType );
+
+    // for verticesT we want to get the data type of the element of a vertex:
+    // ie the data type of the component
+    using verticesT = typename MeshT::PointScalarT;
+
+    auto const& verticesId = typeid( verticesT );
+
+    checkTypeId( verticesId );
+    assignCorrectEnum( verticesId, positionType );
 }
 
 template <typename MeshT>
@@ -28,19 +78,20 @@ void MeshNode<MeshT>::updateVertexBuffer( int const positionLocation, int const 
     glBufferData( GL_ARRAY_BUFFER, sizeof( decltype( *verticesPointer ) ) * numVertices,
                   verticesPointer, GL_STATIC_DRAW );
 
-    glVertexAttribPointer( positionLocation, numberPointCoordinates_, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer( positionLocation, numberPointCoordinates_, positionType, GL_FALSE,
                            sizeof( decltype( *verticesPointer ) ), 0 );
     glEnableVertexAttribArray( positionLocation );
 
     glBindBuffer( GL_ARRAY_BUFFER, colorBuffer_ );
-    glBufferData( GL_ARRAY_BUFFER, sizeof( GLfloat ) * numColors, colorsPointer, GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, sizeof( *colorsPointer ) * numColors, colorsPointer,
+                  GL_STATIC_DRAW );
 
-    glVertexAttribPointer( colorLocation, numberColorsPerVertex_, GL_FLOAT, GL_FALSE,
-                           sizeof( GLfloat ) * numberColorsPerVertex_, 0 );
+    glVertexAttribPointer( colorLocation, numberColorsPerVertex_, colorsType, GL_FALSE,
+                           sizeof( *colorsPointer ) * numberColorsPerVertex_, 0 );
     glEnableVertexAttribArray( colorLocation );
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, indexBuffer_ );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( unsigned int ) * numIndexes_, indexesPointer,
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( *indexesPointer ) * numIndexes_, indexesPointer,
                   GL_STATIC_DRAW );
 
     glBindVertexArray( 0 );

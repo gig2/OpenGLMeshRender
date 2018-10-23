@@ -7,53 +7,81 @@
 #include <utility>
 
 
-
-template <typename MeshT>
-MeshNode<MeshT>::MeshNode( MeshT& meshView )
-    : mesh_{meshView}
+// We only manage GLfloat and GLdoule type
+struct GLTypeId
 {
-    // TODO:
-    // Those operation should be done if the required traits is validated
-    // and it then add those for uv
-    // note that with c++17 we could do simple if constexpr with the required traits by the way
-    // so we may want to check the minimum compiler version "allowed"
+    static std::type_info const& glFloatId;
+    static std::type_info const& glDoubleId;
+};
 
-    // We only manage GLfloat and GLdoule type
-    auto const& glFloatId  = typeid( GLfloat );
-    auto const& glDoubleId = typeid( GLdouble );
+template <typename T>
+void checkTypeId( T const& type )
+{
+    assert( GLTypeId::glFloatId.hash_code() == type.hash_code()
+            || GLTypeId::glDoubleId.hash_code() == type.hash_code() );
+}
 
-
-    // For this lamdba we do not need to capture glFloatId and glDoubleId since they are a
-    // reference initialized with a constant expression
-
-    // this will assert when the data type is not an OpenGL like
-    auto checkTypeId = []( auto const& type ) {
-        assert( glFloatId.hash_code() == type.hash_code()
-                || glDoubleId.hash_code() == type.hash_code() );
-    };
-
-    // Here we want to set the enumValue to GL_FLOAT or GL_DOUBLE depending on the
-    // data type
-    auto assignCorrectEnum = []( auto const& type, auto& enumValue ) {
-        if ( glFloatId.hash_code() == type.hash_code() )
-        {
-            enumValue = GL_FLOAT;
-        }
-        else if ( glDoubleId.hash_code() == type.hash_code() )
-        {
-            enumValue = GL_DOUBLE;
-        }
-    };
+// Here we want to set the enumValue to GL_FLOAT or GL_DOUBLE depending on the
+// data type
+template <typename Type, typename Enum>
+void assignCorrectEnum( Type const& type, Enum& enumValue )
+{
+    if ( GLTypeId::glFloatId.hash_code() == type.hash_code() )
+    {
+        enumValue = GL_FLOAT;
+    }
+    else if ( GLTypeId::glDoubleId.hash_code() == type.hash_code() )
+    {
+        enumValue = GL_DOUBLE;
+    }
+}
 
 
+
+template <typename MeshT, require_colors<MeshT> = dummy::value>
+void tryInitColorType( MeshT const&, GLenum& colorsType )
+{
     using colorT = decltype( std::declval<MeshT>().getColorsPointer() );
 
     auto const& colorId = typeid( std::remove_pointer_t<colorT> );
 
 
     checkTypeId( colorId );
-    assignCorrectEnum( colorId, colorsType_ );
+    assignCorrectEnum( colorId, colorsType );
+}
+template <typename MeshT, require_no_colors<MeshT> = dummy::value>
+void tryInitColorType( MeshT const&, GLenum& )
+{
+}
 
+template <typename MeshT, require_uv<MeshT> = dummy::value>
+void tryInitUVType( MeshT const&, GLenum& uvType )
+{
+    using uvT = decltype( std::declval<MeshT>().getUVPointer() );
+
+    auto const& uvId = typeid( std::remove_pointer_t<uvT> );
+
+
+    checkTypeId( uvId );
+    assignCorrectEnum( uvId, uvType );
+}
+template <typename MeshT, require_no_uv<MeshT> = dummy::value>
+void tryInitUVType( MeshT const&, GLenum& )
+{
+}
+
+
+
+template <typename MeshT>
+MeshNode<MeshT>::MeshNode( MeshT& meshView )
+    : mesh_{meshView}
+{
+    tryInitColorType( mesh_, colorsType_ );
+
+    tryInitUVType( mesh_, uvType_ );
+
+
+    // We should always having points
     // for verticesT we want to get the data type of the element of a vertex:
     // ie the data type of the component
     using verticesT = typename MeshT::PointScalarT;

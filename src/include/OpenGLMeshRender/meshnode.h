@@ -36,6 +36,17 @@ private:
     GLuint colorBuffer_{0};
     GLuint uvBuffer_{0};
 
+    // TODO
+    // use this and also lastSize for
+    // each component to use
+    // glBufferSubData when it is possible
+    // ie when there is less or equal element
+    // than previously
+    bool indexInitialized{false};
+    bool vertexInitialized{false};
+    bool colorInitialized{false};
+    bool uvInitialized{false};
+
     using indexT = decltype( std::declval<MeshT>().getNumIndex() );
 
     indexT numIndexes_{0};
@@ -47,7 +58,7 @@ private:
 
     void cleanBuffers_();
 
-    void regenerateBuffers_();
+    void generateBuffers_();
 };
 
 #include "private/meshnode-internals.hpp"

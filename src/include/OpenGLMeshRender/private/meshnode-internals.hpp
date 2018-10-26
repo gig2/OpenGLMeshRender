@@ -96,7 +96,10 @@ template <typename MeshT>
 void MeshNode<MeshT>::updateVertexBuffer( int const positionLocation, int const colorLocation,
                                           int const uvLocation )
 {
-    regenerateBuffers_();
+    if ( numIndexes_ == 0 )
+    {
+        generateBuffers_();
+    }
 
 
     glBindVertexArray( vao_ );
@@ -116,6 +119,7 @@ void MeshNode<MeshT>::updateVertexBuffer( int const positionLocation, int const 
     auto* indexesPointer = mesh_.getIndexesPointer();
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, indexBuffer_ );
+
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( *indexesPointer ) * numIndexes_, indexesPointer,
                   GL_STATIC_DRAW );
 
@@ -163,10 +167,8 @@ void MeshNode<MeshT>::cleanBuffers_()
 }
 
 template <typename MeshT>
-void MeshNode<MeshT>::regenerateBuffers_()
+void MeshNode<MeshT>::generateBuffers_()
 {
-    cleanBuffers_();
-
     glGenBuffers( 1, &vertexBuffer_ );
     glGenBuffers( 1, &indexBuffer_ );
     glGenBuffers( 1, &colorBuffer_ );

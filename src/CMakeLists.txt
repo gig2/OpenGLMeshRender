@@ -3,7 +3,7 @@ set (openglmeshrender_headers
      include/OpenGLMeshRender/private/meshnode-internals.hpp
      include/OpenGLMeshRender/bindoperation.h
      include/OpenGLMeshRender/mesh_traits.h
-     include/OpenGLMeshRenedr/void_t.h)
+     include/OpenGLMeshRender/void_t.h)
 
 set (openglmeshrender_sources
      meshnode.cpp)

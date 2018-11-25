@@ -146,7 +146,7 @@ void MeshNode<MeshT>::cleanBuffers_()
 {
     if ( glIsBuffer( vao_ ) )
     {
-        glDeleteBuffers( 1, &vao_ );
+        glDeleteVertexArrays( 1, &vao_ );
     }
     if ( glIsBuffer( indexBuffer_ ) )
     {

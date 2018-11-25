@@ -1,5 +1,7 @@
 #include "mesh_traits.h"
 
+#include <GL/glew.h>
+
 // Here we do some tag dispatching using SFINAE
 
 template <typename MeshT, require_vertices<MeshT> = dummy::value>

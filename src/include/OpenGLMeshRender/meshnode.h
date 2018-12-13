@@ -18,6 +18,8 @@ public:
 
     void draw() const;
 
+    void drawPoints() const;
+
     ~MeshNode();
 
     bool needToUpdate{true};

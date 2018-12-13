@@ -134,6 +134,14 @@ void MeshNode<MeshT>::draw() const
     glDrawElements( GL_TRIANGLES, numIndexes_, GL_UNSIGNED_INT, 0 );
     glBindVertexArray( 0 );
 }
+template <typename MeshT>
+void MeshNode<MeshT>::drawPoints() const
+{
+    //
+    glBindVertexArray( vao_ );
+    glDrawElements( GL_POINTS, numIndexes_, GL_UNSIGNED_INT, 0 );
+    glBindVertexArray( 0 );
+}
 
 template <typename MeshT>
 MeshNode<MeshT>::~MeshNode()

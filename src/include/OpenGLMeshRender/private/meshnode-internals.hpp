@@ -139,7 +139,7 @@ void MeshNode<MeshT>::drawPoints() const
 {
     float oldSize{1.f};
     glGetFloatv( GL_POINT_SIZE, &oldSize );
-    glPointSize( 5.f );
+    glPointSize( 2.f );
     glBindVertexArray( vao_ );
     glDrawElements( GL_POINTS, numIndexes_, GL_UNSIGNED_INT, 0 );
     glBindVertexArray( 0 );

@@ -1,6 +1,6 @@
 #include "mesh_traits.h"
 
-#include <GL/glew.h>
+#include <epoxy/gl.h>
 
 // Here we do some tag dispatching using SFINAE
 

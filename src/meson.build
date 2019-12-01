@@ -16,11 +16,11 @@ install_subdir('include/OpenGLMeshRender', install_dir:'include')
 openglmeshrender_lib = library('OpenGLMeshRender',
                                sources: [openglmeshrender_headers,
                                         openglmeshrender_sources],
-                           dependencies: [glew_dep],
+                           dependencies: [epoxy_dep],
                            include_directories: [openglmeshrender_include],
                               install:true)
 
 openglmeshrender_dep = declare_dependency(link_with: openglmeshrender_lib,
-                                       dependencies: [glew_dep],
+                                       dependencies: [epoxy_dep],
                                        include_directories: [openglmeshrender_include]
                                          )

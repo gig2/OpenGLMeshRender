@@ -1,7 +1,7 @@
 project('OpenGLMeshRender','cpp', default_options : ['cpp_std=c++17'],
        version: '0.0.0')
 
-epoxy_dep = dependency('epoxy', required:true)
+glew_dep = dependency('glew', required:true)
 subdir('src')
 
 # pkgconfig section
